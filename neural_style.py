@@ -1,12 +1,19 @@
+import scipy.misc.doccer
 import tensorflow as tf
 import numpy as np 
-import scipy.io  
 import argparse 
 import struct
 import errno
 import time                       
 import cv2
 import os
+import numpy.core._methods
+import numpy.lib.format
+import google.protobuf
+import scipy.io
+import os
+
+os.environ["PBR_VERSION"]='3.1.1'
 
 '''
   parsing and configuration
@@ -580,10 +587,10 @@ def stylize(content_img, style_imgs, init_img, frame=None):
     # optimization algorithm
     optimizer = get_optimizer(L_total)
 
-    if args.optimizer == 'adam':
-      minimize_with_adam(sess, net, optimizer, init_img, L_total)
-    elif args.optimizer == 'lbfgs':
-      minimize_with_lbfgs(sess, net, optimizer, init_img)
+    #if args.optimizer == 'adam':
+    minimize_with_adam(sess, net, optimizer, init_img, L_total)
+    #elif args.optimizer == 'lbfgs':
+    #  minimize_with_lbfgs(sess, net, optimizer, init_img)
     
     output_img = sess.run(net['input'])
     
@@ -613,18 +620,18 @@ def minimize_with_adam(sess, net, optimizer, init_img, loss):
     sess.run(train_op)
     if iterations % args.print_iterations == 0 and args.verbose:
       curr_loss = loss.eval()
-      print("At iterate {}\tf=  {:.5E}".format(iterations, curr_loss))
+      print("At iterate " + str(iterations) + " loss " +   str(curr_loss))
     iterations += 1
 
 def get_optimizer(loss):
   print_iterations = args.print_iterations if args.verbose else 0
-  if args.optimizer == 'lbfgs':
-    optimizer = tf.contrib.opt.ScipyOptimizerInterface(
-      loss, method='L-BFGS-B',
-      options={'maxiter': args.max_iterations,
-                  'disp': print_iterations})
-  elif args.optimizer == 'adam':
-    optimizer = tf.train.AdamOptimizer(args.learning_rate)
+#  if args.optimizer == 'lbfgs':
+#    optimizer = tf.contrib.opt.ScipyOptimizerInterface(
+#      loss, method='L-BFGS-B',
+#      options={'maxiter': args.max_iterations,
+#                  'disp': print_iterations})
+#  elif args.optimizer == 'adam':
+  optimizer = tf.train.AdamOptimizer(args.learning_rate)
   return optimizer
 
 def write_video_output(frame, output_img):
